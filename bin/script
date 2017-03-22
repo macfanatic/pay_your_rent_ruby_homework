@@ -1,0 +1,30 @@
+#! /usr/bin/env ruby
+
+require_relative '../app/lease'
+require_relative '../app/parser'
+
+# Optionally load byebug
+begin
+  require 'byebug'
+rescue LoadError
+end
+
+# Handle missing argument
+if ARGV[0].nil?
+  $stderr.puts 'sorter.rb: must provide a path to a data file'
+  exit(1)
+end
+
+# Parse file, handling invalid file path
+begin
+  leases = Parser.read(ARGV[0])
+rescue Errno::ENOENT => e
+  $stderr.puts e.message
+  exit(1)
+end
+
+# Sort and print data to STDOUT
+leases.sort!
+leases.each do |lease|
+  $stdout.puts lease.raw
+end
